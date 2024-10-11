@@ -3,6 +3,8 @@ package com.datos.exchange.rate.util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -22,39 +24,18 @@ public class CurrencyConverterUtil {
      * @return
      * @throws Exception
      */
-    public double calcularTipoDeCambio(String monedaOrigen, String monedaDestino)
-            throws Exception {
-        log.debug(" calculando tipo de cambio [origen: " + monedaOrigen + "] destino [ "+monedaDestino + "]");
-        if (random.nextInt(100) < 20) {
-            throw new Exception("Error al obtener el tipo de cambio.");
-        }
-        if (monedaOrigen.equals("USD") && monedaDestino.equals("EUR")) {
-            return 0.85;
-        } else if (monedaOrigen.equals("EUR") && monedaDestino.equals("USD")) {
-            return 1.18;
-        } else if (monedaOrigen.equals("USD") && monedaDestino.equals("JPY")) {
-            return 110.00;
-        } else if (monedaOrigen.equals("JPY") && monedaDestino.equals("USD")) {
-            return 0.0091;
-        } else {
-            return 1.0;
-        }
+    private static final Map<String, Double> exchangeRates = new HashMap<>();
+
+    static {
+        exchangeRates.put("USD_EUR", 0.85);
+        exchangeRates.put("EUR_USD", 1.18);
+        exchangeRates.put("USD_JPY", 110.00);
+        exchangeRates.put("JPY_USD", 0.00091);
     }
 
-    /**
-     * Método para realizar la conversión de moneda.
-     *
-     * @param monto
-     * @param monedaOrigen
-     * @param monedaDestino
-     * @return double valor convertido
-     * @throws Exception
-     */
-    public double convertirMoneda(
-            double monto, String monedaOrigen, String monedaDestino)
-            throws Exception {
-        double tipoDeCambio = calcularTipoDeCambio(monedaOrigen, monedaDestino);
-        return monto * tipoDeCambio;
+    public double calcularTipoDeCambio(String monedaOrigen, String monedaDestino) {
+        String key = monedaOrigen + "_" + monedaDestino + monedaDestino;
+        return exchangeRates.getOrDefault(key, 1.0);
     }
 }
 
